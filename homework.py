@@ -12,7 +12,7 @@ load_dotenv()
 PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
 PRAKTIKUM_API_URL = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 headers = {
     'Authorization': 'OAuth ' + PRAKTIKUM_TOKEN,
 }
@@ -49,7 +49,7 @@ def get_homework_statuses(current_timestamp):
 
 
 def send_message(message, bot_client):
-    return bot_client.send_message(chat_id=CHAT_ID, text=message)
+    return bot_client.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 
 def main():
