@@ -25,13 +25,10 @@ logger.setLevel(logging.DEBUG)
 
 def parse_homework_status(homework):
     homework_name = homework.get('homework_name')
-    verdict = None
-    if homework.get('status') == 'rejected':
+    if homework.get('status') != 'approved':
         verdict = 'К сожалению в работе нашлись ошибки.'
-    elif homework.get('status') == 'approved':
+    else:
         verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
-    if not verdict:
-        return f'Работа "{homework_name}" взята в ревью'
     return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
