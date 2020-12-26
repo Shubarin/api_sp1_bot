@@ -8,12 +8,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
+PRAKTIKUM_TOKEN = os.getenv('PRAKTIKUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 PRAKTIKUM_API_URL = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
 headers = {
-    'Authorization': 'OAuth ' + PRAKTIKUM_TOKEN,
+    'Authorization': f'OAuth {PRAKTIKUM_TOKEN}',
+}
+available_statuses_verdicts = {
+    'reviewing': None,
+    'approved': 'Ревьюеру всё понравилось, можно приступать к следующему уроку.',
+    'rejected': 'К сожалению в работе нашлись ошибки.',
 }
 
 logging.basicConfig(format='%(asctime)s; %(levelname)s; %(message)s',
@@ -23,18 +28,25 @@ logger = logging.getLogger('__name__')
 logger.setLevel(logging.DEBUG)
 
 
+class UndefinedStatusError(Exception):
+    pass
+
+
 def parse_homework_status(homework):
     homework_name = homework.get('homework_name')
-    if homework.get('status') != 'approved':
-        verdict = 'К сожалению в работе нашлись ошибки.'
-    else:
-        verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
+    status = homework.get('status')
+    if status is None or status not in available_statuses_verdicts:
+        raise UndefinedStatusError(
+            f'В ответе пришел неизвестный статус {status}')
+    verdict = available_statuses_verdicts[status]
+    if not verdict:
+        return f'Работа "{homework_name}" взята в ревью'
     return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
 def get_homework_statuses(current_timestamp):
     params = {
-        "from_date": current_timestamp
+        'from_date': current_timestamp
     }
     homework_statuses = requests.get(PRAKTIKUM_API_URL,
                                      headers=headers,
